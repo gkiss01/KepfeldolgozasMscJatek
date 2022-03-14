@@ -28,7 +28,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
     }
 
     fun updateGame() {
-        if (gameState == GameState.STOPPED) return
+        if (!isRunning()) return
 
         // lépés megtétele az alsó sorban
         gameObjectsInternal[gameObjectsInternal.lastIndex] =
@@ -56,8 +56,10 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
         gameState = GameState.STOPPED
     }
 
+    fun isRunning() = gameState == GameState.RUNNING
+
     fun updatePointerLocation(offset: DpOffset) {
-        if (gameState == GameState.STOPPED) return
+        if (!isRunning()) return
 
         val angle = (1 - (offset.x / width)) * 180.0
         val direction = MoveDirection.fromAngle(angle)
