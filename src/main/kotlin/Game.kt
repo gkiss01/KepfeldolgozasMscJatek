@@ -12,6 +12,7 @@ class Game(private val rows: Int, val cols: Int) {
     private var gameState: GameState = GameState.RUNNING
     private var nextDirection: MoveDirection = MoveDirection.Stay
 
+    var elapsedTime by mutableStateOf(0)
     var width by mutableStateOf(0.dp)
     var height by mutableStateOf(0.dp)
 
@@ -22,6 +23,7 @@ class Game(private val rows: Int, val cols: Int) {
     fun startGame() {
         gameState = GameState.RUNNING
         gameObjectsInternal.addAll(generateFirstMap(rows, cols))
+        elapsedTime = 0
         render()
     }
 

@@ -2,7 +2,9 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -19,17 +21,15 @@ import kotlinx.coroutines.delay
 @Preview
 fun App() {
     val game = remember { Game(5, 5) }
-    var elapsedTime by remember { mutableStateOf(0) }
-
     val density = LocalDensity.current
 
     LaunchedEffect(key1 = true) {
         game.startGame()
     }
 
-    LaunchedEffect(key1 = elapsedTime) {
+    LaunchedEffect(key1 = game.elapsedTime) {
         delay(1000)
-        elapsedTime += 1
+        game.elapsedTime += 1
 
         // Any update goes here
         game.updateGame()
