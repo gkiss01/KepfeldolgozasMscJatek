@@ -90,7 +90,10 @@ fun App() {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    Window(
+        title = "Game",
+        onCloseRequest = ::exitApplication
+    ) {
         App()
     }
 }

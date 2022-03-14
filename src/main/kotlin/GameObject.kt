@@ -33,7 +33,7 @@ fun GameObject(state: ObjectState, boxSize: Dp = 40.dp) {
         ObjectState.BLOCKED -> Color.Gray
         ObjectState.END -> Color.Red
         ObjectState.ACTUAL -> Color.DarkGray
-        ObjectState.NEXTSTEP -> Color.LightGray
+        ObjectState.NEXTSTEP -> Color(0xFFFFC300)
     }
 
     Box(
