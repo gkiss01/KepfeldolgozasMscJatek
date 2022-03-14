@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
-enum class PieceState {
+enum class ObjectState {
     EMPTY,
     BLOCKED,
     END,
@@ -19,7 +19,7 @@ enum class PieceState {
     NEXTSTEP;
 
     companion object {
-        fun getRandom(blockedChance: Double): PieceState {
+        fun getRandom(blockedChance: Double): ObjectState {
             val rand = Random.Default.nextDouble()
             return if (rand <= blockedChance) BLOCKED else EMPTY
         }
@@ -27,13 +27,13 @@ enum class PieceState {
 }
 
 @Composable
-fun Piece(state: PieceState, boxSize: Dp = 40.dp) {
+fun GameObject(state: ObjectState, boxSize: Dp = 40.dp) {
     val color = when (state) {
-        PieceState.EMPTY -> Color.LightGray
-        PieceState.BLOCKED -> Color.Gray
-        PieceState.END -> Color.DarkGray
-        PieceState.ACTUAL -> Color.Red
-        PieceState.NEXTSTEP -> Color.Magenta
+        ObjectState.EMPTY -> Color.LightGray
+        ObjectState.BLOCKED -> Color.Gray
+        ObjectState.END -> Color.DarkGray
+        ObjectState.ACTUAL -> Color.Red
+        ObjectState.NEXTSTEP -> Color.Magenta
     }
 
     Box(
@@ -47,5 +47,5 @@ fun Piece(state: PieceState, boxSize: Dp = 40.dp) {
 @Preview
 @Composable
 fun PiecePreview() {
-    Piece(PieceState.EMPTY)
+    GameObject(ObjectState.EMPTY)
 }

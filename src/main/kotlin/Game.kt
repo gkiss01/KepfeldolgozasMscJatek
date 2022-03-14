@@ -6,8 +6,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
 class Game(private val rows: Int, val cols: Int) {
-    private val gameObjectsInternal = mutableListOf<MutableList<PieceState>>()
-    val gameObjects = mutableStateListOf<PieceState>()
+    private val gameObjectsInternal = mutableListOf<MutableList<ObjectState>>()
+    val gameObjects = mutableStateListOf<ObjectState>()
 
     private var gameState: GameState = GameState.RUNNING
     private var nextDirection: MoveDirection = MoveDirection.Stay
@@ -35,11 +35,11 @@ class Game(private val rows: Int, val cols: Int) {
         // az elem léptetése egy sorral feljebb
         val pos = getPos(gameObjectsInternal[gameObjectsInternal.lastIndex])
         // a felső sor ellenőrzése, hogy van-e ott fal
-        if (gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] != PieceState.EMPTY) {
-            gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] = PieceState.END
+        if (gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] != ObjectState.EMPTY) {
+            gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] = ObjectState.END
             endGame()
         } else
-            gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] = PieceState.ACTUAL
+            gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] = ObjectState.ACTUAL
 
         // új sor beszúrása felülre
         gameObjectsInternal.add(0, generateRow(cols))
@@ -110,69 +110,69 @@ class Game(private val rows: Int, val cols: Int) {
     }
 
     companion object {
-        fun canMove(row: List<PieceState>, direction: MoveDirection): Boolean {
-            if (!row.contains(PieceState.ACTUAL)) throw GameError.ActualFieldNotFound
-            val pos = row.indexOf(PieceState.ACTUAL)
+        fun canMove(row: List<ObjectState>, direction: MoveDirection): Boolean {
+            if (!row.contains(ObjectState.ACTUAL)) throw GameError.ActualFieldNotFound
+            val pos = row.indexOf(ObjectState.ACTUAL)
 
             if (!row.indices.contains(pos + direction.step)) return false // throw GameError.NextPosOutOfBounds
 
             for (i in direction.toRange()) {
-                if (row[pos + i] != PieceState.EMPTY &&
-                    row[pos + i] != PieceState.NEXTSTEP
+                if (row[pos + i] != ObjectState.EMPTY &&
+                    row[pos + i] != ObjectState.NEXTSTEP
                 ) return false
             }
 
             return true
         }
 
-        fun markMove(row: List<PieceState>, direction: MoveDirection): MutableList<PieceState> {
+        fun markMove(row: List<ObjectState>, direction: MoveDirection): MutableList<ObjectState> {
             if (!canMove(row, direction)) return row.toMutableList() // throw GameError.CannotMakeMove
 
-            val pos = row.indexOf(PieceState.ACTUAL)
+            val pos = row.indexOf(ObjectState.ACTUAL)
             val rowCopy = row.toMutableList()
             rowCopy.forEachIndexed { index, state ->
-                if (state == PieceState.NEXTSTEP)
-                    rowCopy[index] = PieceState.EMPTY
+                if (state == ObjectState.NEXTSTEP)
+                    rowCopy[index] = ObjectState.EMPTY
             }
 
             if (direction.step == 0) return rowCopy
-            rowCopy[pos + direction.step] = PieceState.NEXTSTEP
+            rowCopy[pos + direction.step] = ObjectState.NEXTSTEP
             return rowCopy
         }
 
-        fun makeMove(row: List<PieceState>, direction: MoveDirection): MutableList<PieceState> {
+        fun makeMove(row: List<ObjectState>, direction: MoveDirection): MutableList<ObjectState> {
             if (!canMove(row, direction)) return row.toMutableList() // throw GameError.CannotMakeMove
-            val pos = row.indexOf(PieceState.ACTUAL)
+            val pos = row.indexOf(ObjectState.ACTUAL)
             val rowCopy = row.toMutableList()
-            rowCopy[pos] = PieceState.EMPTY
-            rowCopy[pos + direction.step] = PieceState.ACTUAL
+            rowCopy[pos] = ObjectState.EMPTY
+            rowCopy[pos + direction.step] = ObjectState.ACTUAL
             return rowCopy
         }
 
-        fun getPos(row: List<PieceState>): Int {
-            if (!row.contains(PieceState.ACTUAL)) throw GameError.ActualFieldNotFound
-            return row.indexOf(PieceState.ACTUAL)
+        fun getPos(row: List<ObjectState>): Int {
+            if (!row.contains(ObjectState.ACTUAL)) throw GameError.ActualFieldNotFound
+            return row.indexOf(ObjectState.ACTUAL)
         }
 
-        private fun generateRow(cols: Int, probability: Double = 0.2): MutableList<PieceState> {
-            return (0 until cols).map { PieceState.getRandom(probability) }.toMutableList()
+        private fun generateRow(cols: Int, probability: Double = 0.2): MutableList<ObjectState> {
+            return (0 until cols).map { ObjectState.getRandom(probability) }.toMutableList()
         }
 
-        private fun generateStartRow(cols: Int): MutableList<PieceState> {
+        private fun generateStartRow(cols: Int): MutableList<ObjectState> {
             return generateRow(cols, 0.0).also {
                 val centralIndex = it.size / 2
-                it[centralIndex] = PieceState.ACTUAL
+                it[centralIndex] = ObjectState.ACTUAL
             }
         }
 
-        fun generateFirstMap(rows: Int, cols: Int): MutableList<MutableList<PieceState>> {
-            val pieces = mutableListOf<MutableList<PieceState>>()
+        fun generateFirstMap(rows: Int, cols: Int): MutableList<MutableList<ObjectState>> {
+            val objects = mutableListOf<MutableList<ObjectState>>()
 
             for (i in 1 until rows)
-                pieces += generateRow(cols, 0.0)
-            pieces += generateStartRow(cols)
+                objects += generateRow(cols, 0.0)
+            objects += generateStartRow(cols)
 
-            return pieces
+            return objects
         }
     }
 }

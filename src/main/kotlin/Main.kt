@@ -52,7 +52,7 @@ fun App() {
                 }
             })
         {
-            Map(game.gameObjects, game.cols)
+            GameMap(game.gameObjects, game.cols)
         }
     }
 }
