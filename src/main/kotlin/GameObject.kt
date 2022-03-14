@@ -29,11 +29,11 @@ enum class ObjectState {
 @Composable
 fun GameObject(state: ObjectState, boxSize: Dp = 40.dp) {
     val color = when (state) {
-        ObjectState.EMPTY -> Color.LightGray
+        ObjectState.EMPTY -> Color.White
         ObjectState.BLOCKED -> Color.Gray
-        ObjectState.END -> Color.DarkGray
-        ObjectState.ACTUAL -> Color.Red
-        ObjectState.NEXTSTEP -> Color.Magenta
+        ObjectState.END -> Color.Red
+        ObjectState.ACTUAL -> Color.DarkGray
+        ObjectState.NEXTSTEP -> Color.LightGray
     }
 
     Box(

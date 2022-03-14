@@ -5,7 +5,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
-class Game(private val rows: Int, val cols: Int) {
+class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
     private val gameObjectsInternal = mutableListOf<MutableList<ObjectState>>()
     val gameObjects = mutableStateListOf<ObjectState>()
 

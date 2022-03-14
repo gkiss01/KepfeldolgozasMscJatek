@@ -20,7 +20,7 @@ import kotlinx.coroutines.delay
 @Composable
 @Preview
 fun App() {
-    val game = remember { Game(5, 5) }
+    val game = remember { Game(5, 5, 2000) }
     val density = LocalDensity.current
 
     LaunchedEffect(key1 = true) {
@@ -28,7 +28,7 @@ fun App() {
     }
 
     LaunchedEffect(key1 = game.elapsedTime) {
-        delay(1000)
+        delay(game.speed)
         game.elapsedTime += 1
 
         // Any update goes here
