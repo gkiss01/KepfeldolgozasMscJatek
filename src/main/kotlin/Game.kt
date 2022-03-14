@@ -9,8 +9,8 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
     private val gameObjectsInternal = mutableListOf<MutableList<ObjectState>>()
     val gameObjects = mutableStateListOf<ObjectState>()
 
-    private var gameState: GameState = GameState.RUNNING
-    private var nextDirection: MoveDirection = MoveDirection.Stay
+    private var gameState by mutableStateOf(GameState.RUNNING)
+    private var nextDirection by mutableStateOf<MoveDirection>(MoveDirection.Stay)
 
     var elapsedTime by mutableStateOf(0)
     var width by mutableStateOf(0.dp)
