@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Map(pieces: List<PieceState>) {
     LazyVerticalGrid(
-        cells = GridCells.Fixed(5),
+        cells = GridCells.Fixed(GAME_TABLE_COLS),
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -25,6 +25,6 @@ fun Map(pieces: List<PieceState>) {
 @Preview
 @Composable
 fun MapPreview() {
-    val pieces = (0..24).map { PieceState.getRandom() }
+    val pieces = (0..24).map { PieceState.getRandom(0.2) }
     Map(pieces)
 }

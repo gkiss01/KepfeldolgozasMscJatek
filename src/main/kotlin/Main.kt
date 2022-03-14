@@ -5,14 +5,17 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.delay
 
+const val GAME_TABLE_ROWS = 5
+const val GAME_TABLE_COLS = 5
+
 @Composable
 @Preview
 fun App() {
-    val pieces = remember { mutableStateListOf<PieceState>() }
+    val game = remember { Game() }
     var elapsedTime by remember { mutableStateOf(0) }
 
     LaunchedEffect(key1 = true) {
-        pieces.swapList((0..24).map { PieceState.getRandom() }.toMutableStateList())
+        game.startGame()
     }
 
     LaunchedEffect(key1 = elapsedTime) {
@@ -20,11 +23,11 @@ fun App() {
         elapsedTime += 1
 
         // Any update goes here
-        pieces.swapList((0..24).map { PieceState.getRandom() }.toMutableStateList())
+        game.updateGame()
     }
 
     MaterialTheme {
-        Map(pieces)
+        Map(game.gameObjects)
     }
 }
 
