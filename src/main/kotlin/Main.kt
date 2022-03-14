@@ -26,7 +26,7 @@ import kotlinx.coroutines.delay
 @Composable
 @Preview
 fun App() {
-    val game = remember { Game(5, 5, 2000) }
+    val game = remember { Game(5, 5, difficulty = 0.10) }
     val density = LocalDensity.current
 
     LaunchedEffect(key1 = true) {

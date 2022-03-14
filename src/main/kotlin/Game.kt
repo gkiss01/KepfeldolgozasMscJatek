@@ -5,7 +5,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
-class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
+class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val difficulty: Double = 0.2) {
     private val gameObjectsInternal = mutableListOf<MutableList<ObjectState>>()
     val gameObjects = mutableStateListOf<ObjectState>()
 
@@ -33,6 +33,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
         // lépés megtétele az alsó sorban
         gameObjectsInternal[gameObjectsInternal.lastIndex] =
             makeMove(gameObjectsInternal[gameObjectsInternal.lastIndex], nextDirection)
+        nextDirection = MoveDirection.Stay
 
         // az elem léptetése egy sorral feljebb
         val pos = getPos(gameObjectsInternal[gameObjectsInternal.lastIndex])
@@ -44,7 +45,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
             gameObjectsInternal[gameObjectsInternal.lastIndex - 1][pos] = ObjectState.ACTUAL
 
         // új sor beszúrása felülre
-        gameObjectsInternal.add(0, generateRow(cols))
+        gameObjectsInternal.add(0, generateRow(cols, difficulty))
 
         // utolsó sor törlése
         gameObjectsInternal.removeLast()
@@ -158,6 +159,16 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
             return row.indexOf(ObjectState.ACTUAL)
         }
 
+        fun generateFirstMap(rows: Int, cols: Int): MutableList<MutableList<ObjectState>> {
+            val objects = mutableListOf<MutableList<ObjectState>>()
+
+            for (i in 1 until rows)
+                objects += generateRow(cols, 0.0)
+            objects += generateStartRow(cols)
+
+            return objects
+        }
+
         private fun generateRow(cols: Int, probability: Double = 0.2): MutableList<ObjectState> {
             return (0 until cols).map { ObjectState.getRandom(probability) }.toMutableList()
         }
@@ -167,16 +178,6 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L) {
                 val centralIndex = it.size / 2
                 it[centralIndex] = ObjectState.ACTUAL
             }
-        }
-
-        fun generateFirstMap(rows: Int, cols: Int): MutableList<MutableList<ObjectState>> {
-            val objects = mutableListOf<MutableList<ObjectState>>()
-
-            for (i in 1 until rows)
-                objects += generateRow(cols, 0.0)
-            objects += generateStartRow(cols)
-
-            return objects
         }
     }
 }
