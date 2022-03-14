@@ -59,10 +59,10 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
 
     fun isRunning() = gameState == GameState.RUNNING
 
-    fun updatePointerLocation(offset: DpOffset) {
+    fun updateAngle(angle: Double) {
         if (!isRunning()) return
+        if (angle < 0.0 || angle > 180.0) return
 
-        val angle = (1 - (offset.x / width)) * 180.0
         val direction = MoveDirection.fromAngle(angle)
 
         if (canMove(gameObjectsInternal[gameObjectsInternal.lastIndex], direction))
@@ -72,6 +72,11 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
             markMove(gameObjectsInternal[gameObjectsInternal.lastIndex], direction)
 
         render()
+    }
+
+    fun updatePointerLocation(offset: DpOffset) {
+        val angle = (1 - (offset.x / width)) * 180.0
+        updateAngle(angle)
     }
 
     sealed class MoveDirection(val step: Int) {
@@ -105,9 +110,6 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
 
     sealed class GameError : Exception() {
         object ActualFieldNotFound : GameError()
-        object ActualPosOutOfBounds : GameError()
-        object NextPosOutOfBounds : GameError()
-        object CannotMakeMove : GameError()
     }
 
     enum class GameState {
