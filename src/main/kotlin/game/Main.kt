@@ -127,7 +127,7 @@ fun main() {
             exitProcessOnExit = false
         ) {
             Window(
-                title = "Game (angle: ${String.format("%.2f", angle)}°)",
+                title = "Game (angle: ${String.format("%.2f", angle)}${if (angle.isNaN()) "" else "°"})",
                 onCloseRequest = ::exitApplication
             ) {
                 App(angle)
