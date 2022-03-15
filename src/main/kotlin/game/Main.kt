@@ -15,9 +15,12 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import initWindows
 import kotlinx.coroutines.*
 import nu.pattern.OpenCV
@@ -126,8 +129,15 @@ fun main() {
         application(
             exitProcessOnExit = false
         ) {
+            val state = rememberWindowState(
+                position = WindowPosition(Alignment.Center),
+                width = (screenDimension.width / 2).dp,
+                height = (screenDimension.height / 2).dp
+            )
+
             Window(
                 title = "Game (angle: ${String.format("%.2f", angle)}${if (angle.isNaN()) "" else "°"})",
+                state = state,
                 onCloseRequest = ::exitApplication
             ) {
                 App(angle)
