@@ -1,3 +1,5 @@
+package game
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,7 +75,7 @@ fun App() {
                         )
                     } else {
                         Text(
-                            text = "Game Over!",
+                            text = "game.Game Over!",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -91,7 +93,7 @@ fun App() {
 
 fun main() = application {
     Window(
-        title = "Game",
+        title = "game.Game",
         onCloseRequest = ::exitApplication
     ) {
         App()

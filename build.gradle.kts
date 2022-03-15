@@ -18,6 +18,8 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+
+    implementation("org.openpnp:opencv:4.5.1-2")
 }
 
 tasks.withType<KotlinCompile> {

@@ -1,3 +1,5 @@
+package game
+
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
 fun <T> SnapshotStateList<T>.swapList(newList: List<T>) {
