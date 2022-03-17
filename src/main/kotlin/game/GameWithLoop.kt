@@ -15,11 +15,12 @@ class GameWithLoop(
     private val difficulty: Double = 0.2
 ) {
     val objectsToRender = mutableStateListOf<ObjectState>()
+    var state by mutableStateOf(GameState.STARTING)
+        private set
     var score by mutableStateOf(0L)
         private set
 
     private var coroutineScope = CoroutineScope(Dispatchers.Main)
-    private var isActive = false
 
     private var timeMillis = 0L
     private var lastTimestamp = 0L
@@ -38,16 +39,17 @@ class GameWithLoop(
     var height by mutableStateOf(0.dp)
 
     fun start() {
-        if (isActive) return
+        if (state == GameState.RUNNING) return
 
-        objects.swapList(Game.generateFirstMap(rows, cols))
+        if (state == GameState.STARTING)
+            objects.swapList(Game.generateFirstMap(rows, cols))
 
         coroutineScope.launch {
             lastTimestamp = System.currentTimeMillis()
             lastIterationTimestamp = lastTimestamp
-            this@GameWithLoop.isActive = true
+            state = GameState.RUNNING
 
-            while (this@GameWithLoop.isActive) {
+            while (state == GameState.RUNNING) {
                 delay(16L)
                 timeMillis += System.currentTimeMillis() - lastTimestamp
                 lastTimestamp = System.currentTimeMillis()
@@ -67,8 +69,8 @@ class GameWithLoop(
         }
     }
 
-    fun pause() {
-        isActive = false
+    fun stop() {
+        state = GameState.STOPPED
     }
 
     fun reset() {
@@ -77,11 +79,9 @@ class GameWithLoop(
         timeMillis = 0L
         lastTimestamp = 0L
         lastIterationTimestamp = 0L
-        isActive = false
+        state = GameState.STARTING
         score = 0L
     }
-
-    fun isActive() = isActive
 
     private fun updateGameMap() {
         // lépés megtétele az alsó sorban
@@ -93,7 +93,7 @@ class GameWithLoop(
         val pos = Game.getPos(objects[objects.lastIndex])
         if (objects[objects.lastIndex - 1][pos] != ObjectState.EMPTY) { // a felső sor ellenőrzése, hogy van-e ott fal
             objects[objects.lastIndex - 1][pos] = ObjectState.END
-            pause()
+            stop()
         } else {
             objects[objects.lastIndex - 1][pos] = ObjectState.ACTUAL
         }
@@ -116,6 +116,12 @@ class GameWithLoop(
         // következő mező kijelölése
         objects[objects.lastIndex] =
             Game.markMove(objects[objects.lastIndex], nextDirection)
+    }
+
+    enum class GameState {
+        STARTING,
+        RUNNING,
+        STOPPED
     }
 
     fun updatePointerLocation(offset: DpOffset) {

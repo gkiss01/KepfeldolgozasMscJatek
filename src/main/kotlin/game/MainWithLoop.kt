@@ -64,26 +64,41 @@ fun AppLoop() {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (game.isActive()) {
-                        Text(
-                            text = "Your score is ${game.score}.",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    } else {
-                        Text(
-                            text = "Game Over!",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Your best score is ${game.score}.",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                    GameMessages(game)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun GameMessages(game: GameWithLoop) {
+    when (game.state) {
+        GameWithLoop.GameState.STARTING -> {
+            Text(
+                text = "Good luck!",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        GameWithLoop.GameState.RUNNING -> {
+            Text(
+                text = "Your score is ${game.score}.",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        GameWithLoop.GameState.STOPPED -> {
+            Text(
+                text = "Game Over!",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Your best score is ${game.score}.",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
