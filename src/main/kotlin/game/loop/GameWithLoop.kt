@@ -1,4 +1,4 @@
-package game
+package game.loop
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -6,6 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import game.Game
+import game.ObjectState
+import game.swapList
 import kotlinx.coroutines.*
 
 class GameWithLoop(
