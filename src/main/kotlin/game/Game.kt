@@ -173,7 +173,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
             return objects
         }
 
-        private fun generateRow(cols: Int, probability: Double = 0.2): MutableList<ObjectState> {
+        fun generateRow(cols: Int, probability: Double = 0.2): MutableList<ObjectState> {
             return (0 until cols).map { ObjectState.getRandom(probability) }.toMutableList()
         }
 
