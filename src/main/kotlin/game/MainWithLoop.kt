@@ -75,11 +75,11 @@ fun AppLoop() {
 private fun GameMessages(game: GameWithLoop) {
     when (game.state) {
         GameWithLoop.GameState.STARTING -> {
-            Text(
-                text = "Good luck!",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+//            Text(
+//                text = "Good luck!",
+//                fontSize = 20.sp,
+//                fontWeight = FontWeight.SemiBold
+//            )
         }
         GameWithLoop.GameState.RUNNING -> {
             Text(
