@@ -112,9 +112,11 @@ class GameWithLoop(
         val direction = Game.MoveDirection.fromAngle(angle)
 
         // léphetünk-e a kijelölt irányban
-        if (GameCore.canMove(objects[objects.lastIndex], direction))
+        if (GameCore.canMove(objects[objects.lastIndex], direction)) {
             nextDirection = direction
-
+            angle = Double.NaN
+        }
+        
         // következő mező kijelölése
         objects[objects.lastIndex] =
             GameCore.markMove(objects[objects.lastIndex], nextDirection)
