@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import game.Game
-import game.ObjectState
 import game.swapList
 import kotlinx.coroutines.*
 
@@ -17,7 +16,7 @@ class GameWithLoop(
     private val iterationDelay: Long = 1000L,
     private val difficulty: Double = 0.2
 ) {
-    val objectsToRender = mutableStateListOf<ObjectState>()
+    val objectsToRender = mutableStateListOf<ObjectStateWithLoop>()
     var state by mutableStateOf(GameState.STARTING)
         private set
     var score by mutableStateOf(0L)
@@ -29,7 +28,7 @@ class GameWithLoop(
     private var lastTimestamp = 0L
     private var lastIterationTimestamp = 0L
 
-    private val objects = mutableListOf<MutableList<ObjectState>>()
+    private val objects = mutableListOf<MutableList<ObjectStateWithLoop>>()
     private var nextDirection: Game.MoveDirection = Game.MoveDirection.Stay
 
     private var angle: Double = Double.NaN
@@ -45,7 +44,7 @@ class GameWithLoop(
         if (state == GameState.RUNNING) return
 
         if (state == GameState.STARTING)
-            objects.swapList(Game.generateFirstMap(rows, cols))
+            objects.swapList(GameCore.generateFirstMap(rows, cols))
 
         coroutineScope.launch {
             lastTimestamp = System.currentTimeMillis()
@@ -89,20 +88,20 @@ class GameWithLoop(
     private fun updateGameMap() {
         // lépés megtétele az alsó sorban
         objects[objects.lastIndex] =
-            Game.makeMove(objects[objects.lastIndex], nextDirection)
+            GameCore.makeMove(objects[objects.lastIndex], nextDirection)
         nextDirection = Game.MoveDirection.Stay
 
         // az elem léptetése egy sorral feljebb
-        val pos = Game.getPos(objects[objects.lastIndex])
-        if (objects[objects.lastIndex - 1][pos] != ObjectState.EMPTY) { // a felső sor ellenőrzése, hogy van-e ott fal
-            objects[objects.lastIndex - 1][pos] = ObjectState.END
+        val pos = GameCore.getPos(objects[objects.lastIndex])
+        if (objects[objects.lastIndex - 1][pos] !is ObjectStateWithLoop.Empty) { // a felső sor ellenőrzése, hogy van-e ott fal
+            objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.End
             stop()
         } else {
-            objects[objects.lastIndex - 1][pos] = ObjectState.ACTUAL
+            objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.Actual
         }
 
         // új sor beszúrása felülre
-        objects.add(0, Game.generateRow(cols, difficulty))
+        objects.add(0, GameCore.generateRow(cols, difficulty))
 
         // utolsó sor törlése
         objects.removeLast()
@@ -113,12 +112,12 @@ class GameWithLoop(
         val direction = Game.MoveDirection.fromAngle(angle)
 
         // léphetünk-e a kijelölt irányban
-        if (Game.canMove(objects[objects.lastIndex], direction))
+        if (GameCore.canMove(objects[objects.lastIndex], direction))
             nextDirection = direction
 
         // következő mező kijelölése
         objects[objects.lastIndex] =
-            Game.markMove(objects[objects.lastIndex], nextDirection)
+            GameCore.markMove(objects[objects.lastIndex], nextDirection)
     }
 
     enum class GameState {

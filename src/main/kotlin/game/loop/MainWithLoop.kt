@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import game.GameMap
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.system.exitProcess
 
@@ -59,7 +58,7 @@ fun AppLoop() {
             }
         ) {
             Column {
-                GameMap(game.objectsToRender, game.cols)
+                GameMapWithLoop(game.objectsToRender, game.cols)
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
