@@ -12,15 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
-sealed class ObjectStateWithLoop {
-    object Empty : ObjectStateWithLoop()
-    object Blocked : ObjectStateWithLoop()
-    object End : ObjectStateWithLoop()
-    object Actual : ObjectStateWithLoop()
-    data class NextStep(val percentage: Double = 0.0) : ObjectStateWithLoop()
+sealed class GameObjectState {
+    object Empty : GameObjectState()
+    object Blocked : GameObjectState()
+    object End : GameObjectState()
+    object Actual : GameObjectState()
+    data class NextStep(val percentage: Double = 0.0) : GameObjectState()
 
     companion object {
-        fun getRandom(blockedChance: Double): ObjectStateWithLoop {
+        fun getRandom(blockedChance: Double): GameObjectState {
             val rand = Random.Default.nextDouble()
             return if (rand <= blockedChance) Blocked else Empty
         }
@@ -38,13 +38,13 @@ sealed class ObjectStateWithLoop {
 }
 
 @Composable
-fun GameObjectWithLoop(state: ObjectStateWithLoop) {
+fun GameObjectWithLoop(state: GameObjectState) {
     val color = when (state) {
-        ObjectStateWithLoop.Actual -> Color.DarkGray
-        ObjectStateWithLoop.Blocked -> Color.Gray
-        ObjectStateWithLoop.Empty -> Color.White
-        ObjectStateWithLoop.End -> Color.Red
-        is ObjectStateWithLoop.NextStep -> Color.White
+        GameObjectState.Actual -> Color.DarkGray
+        GameObjectState.Blocked -> Color.Gray
+        GameObjectState.Empty -> Color.White
+        GameObjectState.End -> Color.Red
+        is GameObjectState.NextStep -> Color.White
     }
 
     Card(
@@ -53,7 +53,7 @@ fun GameObjectWithLoop(state: ObjectStateWithLoop) {
         backgroundColor = color,
         elevation = 20.dp
     ) {
-        if (state is ObjectStateWithLoop.NextStep) {
+        if (state is GameObjectState.NextStep) {
             LinearProgressIndicator(
                 progress = state.percentage.toFloat(),
                 modifier = Modifier.fillMaxSize(),
@@ -67,5 +67,5 @@ fun GameObjectWithLoop(state: ObjectStateWithLoop) {
 @Preview
 @Composable
 fun GameObjectWithLoopPreview() {
-    GameObjectWithLoop(ObjectStateWithLoop.NextStep(0.5))
+    GameObjectWithLoop(GameObjectState.NextStep(0.5))
 }

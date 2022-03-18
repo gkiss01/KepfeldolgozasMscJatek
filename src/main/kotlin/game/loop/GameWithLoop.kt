@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import game.Game
 import game.swapList
 import kotlinx.coroutines.*
 
@@ -17,7 +16,7 @@ class GameWithLoop(
     private val fillUpDelay: Long = (iterationDelay / 2.5).toLong(),
     private val difficulty: Double = 0.2
 ) {
-    val objectsToRender = mutableStateListOf<ObjectStateWithLoop>()
+    val objectsToRender = mutableStateListOf<GameObjectState>()
     var state by mutableStateOf(GameState.STARTING)
         private set
     var score by mutableStateOf(0L)
@@ -29,7 +28,7 @@ class GameWithLoop(
     private var lastTimestamp = 0L
     private var lastIterationTimestamp = 0L
 
-    private val objects = mutableListOf<MutableList<ObjectStateWithLoop>>()
+    private val objects = mutableListOf<GameRowMutable>()
 
     private var angle: Double = Double.NaN
         set(value) {
@@ -90,18 +89,18 @@ class GameWithLoop(
         val pos = objects[objects.lastIndex].getActualIndex()
 
         // a játéktábla léptetése egy sorral lejjebb
-        if (objects[objects.lastIndex - 1][pos] !is ObjectStateWithLoop.Empty) { // ha falba ütközünk, a játéknak vége
-            objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.End
+        if (objects[objects.lastIndex - 1][pos] !is GameObjectState.Empty) { // ha falba ütközünk, a játéknak vége
+            objects[objects.lastIndex - 1][pos] = GameObjectState.End
             stop()
         } else {
             // aktuális mező átléptetése
-            objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.Actual
+            objects[objects.lastIndex - 1][pos] = GameObjectState.Actual
 
             // következő mező irányának megjegyzése és betöltése az új sorba
             val nextPos = objects[objects.lastIndex].getHighlightIndex()
-            if (nextPos != -1 && objects[objects.lastIndex - 1][nextPos] is ObjectStateWithLoop.Empty) { // csak ha ott üres mező áll
+            if (nextPos != -1 && objects[objects.lastIndex - 1][nextPos] is GameObjectState.Empty) { // csak ha ott üres mező áll
                 val nextStep = objects[objects.lastIndex].getHighlight()
-                objects[objects.lastIndex - 1][nextPos] = ObjectStateWithLoop.NextStep(nextStep!!.percentage)
+                objects[objects.lastIndex - 1][nextPos] = GameObjectState.NextStep(nextStep!!.percentage)
             }
         }
 
@@ -114,19 +113,13 @@ class GameWithLoop(
 
     private fun updateGameObjects() {
         // irány lekérése a szögből
-        val direction = Game.MoveDirection.fromAngle(angle)
+        val direction = GameMove.fromAngle(angle)
 
         // szög elfelejtése => így ha nincs bemenet, megáll a lépkedés
         angle = Double.NaN
 
         // mezők frissítése => haladásjelző frissítése, átlépés
         objects[objects.lastIndex].markMove(direction, fillUpDelay)
-    }
-
-    enum class GameState {
-        STARTING,
-        RUNNING,
-        STOPPED
     }
 
     fun updatePointerLocation(offset: DpOffset) {

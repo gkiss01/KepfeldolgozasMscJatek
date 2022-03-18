@@ -74,21 +74,21 @@ fun AppLoop() {
 @Composable
 private fun GameMessages(game: GameWithLoop) {
     when (game.state) {
-        GameWithLoop.GameState.STARTING -> {
+        GameState.STARTING -> {
 //            Text(
 //                text = "Good luck!",
 //                fontSize = 20.sp,
 //                fontWeight = FontWeight.SemiBold
 //            )
         }
-        GameWithLoop.GameState.RUNNING -> {
+        GameState.RUNNING -> {
             Text(
                 text = "Your score is ${game.score}.",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold
             )
         }
-        GameWithLoop.GameState.STOPPED -> {
+        GameState.STOPPED -> {
             Text(
                 text = "Game Over!",
                 fontSize = 20.sp,

@@ -6,13 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import game.loop.GameError
+import game.loop.GameMove
 
 class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val difficulty: Double = 0.2) {
     private val gameObjectsInternal = mutableListOf<MutableList<ObjectState>>()
     val gameObjects = mutableStateListOf<ObjectState>()
 
     private var gameState by mutableStateOf(GameState.RUNNING)
-    private var nextDirection by mutableStateOf<MoveDirection>(MoveDirection.Stay)
+    private var nextDirection by mutableStateOf<GameMove>(GameMove.Stay)
 
     var elapsedTime by mutableStateOf(0)
     var width by mutableStateOf(0.dp)
@@ -35,7 +37,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
         // lépés megtétele az alsó sorban
         gameObjectsInternal[gameObjectsInternal.lastIndex] =
             makeMove(gameObjectsInternal[gameObjectsInternal.lastIndex], nextDirection)
-        nextDirection = MoveDirection.Stay
+        nextDirection = GameMove.Stay
 
         // az elem léptetése egy sorral feljebb
         val pos = getPos(gameObjectsInternal[gameObjectsInternal.lastIndex])
@@ -65,7 +67,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
         if (!isRunning()) return
         if (angle < 0.0 || angle > 180.0) return
 
-        val direction = MoveDirection.fromAngle(angle)
+        val direction = GameMove.fromAngle(angle)
 
         if (canMove(gameObjectsInternal[gameObjectsInternal.lastIndex], direction))
             nextDirection = direction
@@ -81,45 +83,12 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
         updateAngle(angle)
     }
 
-    sealed class MoveDirection(val step: Int) {
-        object Stay : MoveDirection(0)
-        object Left : MoveDirection(-1)
-        object LeftBig : MoveDirection(-2)
-        object Right : MoveDirection(1)
-        object RightBig : MoveDirection(2)
-
-        fun toRange(): IntProgression {
-            return when {
-                step == 0 -> IntRange.EMPTY
-                step > 0 -> 1..step
-                else -> -1 downTo step
-            }
-        }
-
-        companion object {
-            fun fromAngle(angDeg: Double): MoveDirection {
-                return when {
-                    0.0 <= angDeg && angDeg < 30.0 -> RightBig
-                    30.0 <= angDeg && angDeg < 70.0 -> Right
-                    angDeg in 70.0..110.0 -> Stay
-                    110.0 < angDeg && angDeg <= 150.0 -> Left
-                    150.0 < angDeg && angDeg <= 180.0 -> LeftBig
-                    else -> Stay
-                }
-            }
-        }
-    }
-
-    sealed class GameError : Exception() {
-        object ActualFieldNotFound : GameError()
-    }
-
     enum class GameState {
         STOPPED, RUNNING
     }
 
     companion object {
-        fun canMove(row: List<ObjectState>, direction: MoveDirection): Boolean {
+        fun canMove(row: List<ObjectState>, direction: GameMove): Boolean {
             if (!row.contains(ObjectState.ACTUAL)) throw GameError.ActualFieldNotFound
             val pos = row.indexOf(ObjectState.ACTUAL)
 
@@ -134,7 +103,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
             return true
         }
 
-        fun markMove(row: List<ObjectState>, direction: MoveDirection): MutableList<ObjectState> {
+        fun markMove(row: List<ObjectState>, direction: GameMove): MutableList<ObjectState> {
             if (!canMove(row, direction)) return row.toMutableList() // throw GameError.CannotMakeMove
 
             val pos = row.indexOf(ObjectState.ACTUAL)
@@ -149,7 +118,7 @@ class Game(private val rows: Int, val cols: Int, val speed: Long = 1000L, val di
             return rowCopy
         }
 
-        fun makeMove(row: List<ObjectState>, direction: MoveDirection): MutableList<ObjectState> {
+        fun makeMove(row: List<ObjectState>, direction: GameMove): MutableList<ObjectState> {
             if (!canMove(row, direction)) return row.toMutableList() // throw GameError.CannotMakeMove
             val pos = row.indexOf(ObjectState.ACTUAL)
             val rowCopy = row.toMutableList()

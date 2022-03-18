@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun GameMapWithLoop(objects: List<ObjectStateWithLoop>, cols: Int) {
+fun GameMapWithLoop(objects: List<GameObjectState>, cols: Int) {
     LazyVerticalGrid(
         cells = GridCells.Fixed(cols),
         contentPadding = PaddingValues(12.dp),
