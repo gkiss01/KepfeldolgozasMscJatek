@@ -19,27 +19,31 @@ class GameCore {
             return true
         }
 
-        fun markMove(row: List<ObjectStateWithLoop>, direction: Game.MoveDirection): MutableList<ObjectStateWithLoop> {
-            if (!canMove(row, direction)) return row.toMutableList() // throw GameError.CannotMakeMove
-
-            val pos = row.indexOf(ObjectStateWithLoop.Actual)
+        fun markMove(
+            row: List<ObjectStateWithLoop>,
+            direction: Game.MoveDirection,
+            fillUpDelay: Long = 300L
+        ): MutableList<ObjectStateWithLoop> {
             val rowCopy = row.toMutableList()
-            rowCopy.forEachIndexed { index, state ->
-                if (state is ObjectStateWithLoop.NextStep)
-                    rowCopy[index] = ObjectStateWithLoop.Empty
+            val nextPos = rowCopy.getHighlightIndex()
+            val nextStep = rowCopy.getHighlight()
+            rowCopy.removeHighlights()
+
+            if (!canMove(row, direction) || direction is Game.MoveDirection.Stay) return rowCopy
+
+            val actualPos = rowCopy.getActualIndex()
+            if (nextPos != -1 && actualPos + direction.step == nextPos) {
+                val fraction = 0.9 / (fillUpDelay / 16L)
+                val newPercentage = nextStep!!.percentage + fraction
+                if (newPercentage >= 1.0) {
+                    rowCopy[actualPos] = ObjectStateWithLoop.Empty
+                    rowCopy[nextPos] = ObjectStateWithLoop.Actual
+                } else {
+                    rowCopy[nextPos] = ObjectStateWithLoop.NextStep(newPercentage)
+                }
+            } else {
+                rowCopy[actualPos + direction.step] = ObjectStateWithLoop.NextStep(0.1)
             }
-
-            if (direction.step == 0) return rowCopy
-            rowCopy[pos + direction.step] = ObjectStateWithLoop.NextStep(0.5)
-            return rowCopy
-        }
-
-        fun makeMove(row: List<ObjectStateWithLoop>, direction: Game.MoveDirection): MutableList<ObjectStateWithLoop> {
-            if (!canMove(row, direction)) return row.toMutableList() // throw GameError.CannotMakeMove
-            val pos = row.indexOf(ObjectStateWithLoop.Actual)
-            val rowCopy = row.toMutableList()
-            rowCopy[pos] = ObjectStateWithLoop.Empty
-            rowCopy[pos + direction.step] = ObjectStateWithLoop.Actual
             return rowCopy
         }
 
@@ -67,6 +71,29 @@ class GameCore {
                 val centralIndex = it.size / 2
                 it[centralIndex] = ObjectStateWithLoop.Actual
             }
+        }
+    }
+}
+
+typealias GameRow = MutableList<ObjectStateWithLoop>
+
+fun GameRow.getActualIndex(): Int {
+    return indexOfFirst { it is ObjectStateWithLoop.Actual }
+}
+
+fun GameRow.getHighlightIndex(): Int {
+    return indexOfFirst { it is ObjectStateWithLoop.NextStep }
+}
+
+fun GameRow.getHighlight(): ObjectStateWithLoop.NextStep? {
+    return find { it is ObjectStateWithLoop.NextStep } as? ObjectStateWithLoop.NextStep
+}
+
+fun GameRow.removeHighlights() {
+    replaceAll {
+        when (it) {
+            is ObjectStateWithLoop.NextStep -> ObjectStateWithLoop.Empty
+            else -> it
         }
     }
 }

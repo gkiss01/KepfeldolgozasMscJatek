@@ -14,6 +14,7 @@ class GameWithLoop(
     private val rows: Int,
     val cols: Int,
     private val iterationDelay: Long = 1000L,
+    private val fillUpDelay: Long = (iterationDelay / 2.5).toLong(),
     private val difficulty: Double = 0.2
 ) {
     val objectsToRender = mutableStateListOf<ObjectStateWithLoop>()
@@ -87,9 +88,9 @@ class GameWithLoop(
 
     private fun updateGameMap() {
         // lépés megtétele az alsó sorban
-        objects[objects.lastIndex] =
-            GameCore.makeMove(objects[objects.lastIndex], nextDirection)
-        nextDirection = Game.MoveDirection.Stay
+//        objects[objects.lastIndex] =
+//            GameCore.makeMove(objects[objects.lastIndex], nextDirection)
+//        nextDirection = Game.MoveDirection.Stay
 
         // az elem léptetése egy sorral feljebb
         val pos = GameCore.getPos(objects[objects.lastIndex])
@@ -98,6 +99,13 @@ class GameWithLoop(
             stop()
         } else {
             objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.Actual
+
+            // töltés megjegyzése
+            val nextPos = objects[objects.lastIndex].indexOfFirst { it is ObjectStateWithLoop.NextStep }
+            if (nextPos != -1 && objects[objects.lastIndex - 1][nextPos] is ObjectStateWithLoop.Empty) {
+                val nextStepObject = objects[objects.lastIndex].elementAt(nextPos) as ObjectStateWithLoop.NextStep
+                objects[objects.lastIndex - 1][nextPos] = ObjectStateWithLoop.NextStep(nextStepObject.percentage)
+            }
         }
 
         // új sor beszúrása felülre
@@ -111,15 +119,12 @@ class GameWithLoop(
         // irány lekérése a szögből
         val direction = Game.MoveDirection.fromAngle(angle)
 
-        // léphetünk-e a kijelölt irányban
-        if (GameCore.canMove(objects[objects.lastIndex], direction)) {
-            nextDirection = direction
-            angle = Double.NaN
-        }
-        
-        // következő mező kijelölése
+        // szög elfelejtése => így ha nincs bemenet, megáll a lépkedés
+        angle = Double.NaN
+
+        // mezők frissítése => haladásjelző frissítése, átlépés
         objects[objects.lastIndex] =
-            GameCore.markMove(objects[objects.lastIndex], nextDirection)
+            GameCore.markMove(objects[objects.lastIndex], direction, fillUpDelay)
     }
 
     enum class GameState {

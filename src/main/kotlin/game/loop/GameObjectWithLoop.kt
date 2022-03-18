@@ -1,13 +1,13 @@
 package game.loop
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
@@ -25,8 +25,17 @@ sealed class ObjectStateWithLoop {
             return if (rand <= blockedChance) Blocked else Empty
         }
     }
-}
 
+    override fun toString(): String {
+        return when (this) {
+            Actual -> "Actual"
+            Blocked -> "Blocked"
+            Empty -> "Empty"
+            End -> "End"
+            is NextStep -> "NextStep($percentage)"
+        }
+    }
+}
 
 @Composable
 fun GameObjectWithLoop(state: ObjectStateWithLoop) {
@@ -35,15 +44,24 @@ fun GameObjectWithLoop(state: ObjectStateWithLoop) {
         ObjectStateWithLoop.Blocked -> Color.Gray
         ObjectStateWithLoop.Empty -> Color.White
         ObjectStateWithLoop.End -> Color.Red
-        is ObjectStateWithLoop.NextStep -> Color(0xFFFFC300).copy(alpha = state.percentage.toFloat())
+        is ObjectStateWithLoop.NextStep -> Color.White
     }
 
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .shadow(20.dp)
-            .background(color, RoundedCornerShape(5.dp))
-    )
+    Card(
+        modifier = Modifier.size(40.dp),
+        shape = RoundedCornerShape(5.dp),
+        backgroundColor = color,
+        elevation = 20.dp
+    ) {
+        if (state is ObjectStateWithLoop.NextStep) {
+            LinearProgressIndicator(
+                progress = state.percentage.toFloat(),
+                modifier = Modifier.fillMaxSize(),
+                backgroundColor = Color.White,
+                color = Color(0xFFFFC300)
+            )
+        }
+    }
 }
 
 @Preview
