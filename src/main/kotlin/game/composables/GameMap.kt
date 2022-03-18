@@ -1,4 +1,4 @@
-package game.loop
+package game.composables
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -7,10 +7,11 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
+import game.GameObjectState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun GameMapWithLoop(objects: List<GameObjectState>, cols: Int) {
+fun GameMap(objects: List<GameObjectState>, cols: Int) {
     LazyVerticalGrid(
         cells = GridCells.Fixed(cols),
         contentPadding = PaddingValues(12.dp),
@@ -18,7 +19,7 @@ fun GameMapWithLoop(objects: List<GameObjectState>, cols: Int) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(objects.size) {
-            GameObjectWithLoop(objects[it])
+            GameObject(objects[it])
         }
     }
 }

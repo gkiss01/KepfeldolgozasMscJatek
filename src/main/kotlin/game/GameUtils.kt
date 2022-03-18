@@ -1,4 +1,6 @@
-package game.loop
+package game
+
+import kotlin.random.Random
 
 enum class GameState {
     STARTING,
@@ -35,6 +37,31 @@ sealed class GameMove(val step: Int) {
                 150.0 < angDeg && angDeg <= 180.0 -> LeftBig
                 else -> Stay
             }
+        }
+    }
+}
+
+sealed class GameObjectState {
+    object Empty : GameObjectState()
+    object Blocked : GameObjectState()
+    object End : GameObjectState()
+    object Actual : GameObjectState()
+    data class NextStep(val percentage: Double = 0.0) : GameObjectState()
+
+    companion object {
+        fun getRandom(blockedChance: Double): GameObjectState {
+            val rand = Random.Default.nextDouble()
+            return if (rand <= blockedChance) Blocked else Empty
+        }
+    }
+
+    override fun toString(): String {
+        return when (this) {
+            Actual -> "Actual"
+            Blocked -> "Blocked"
+            Empty -> "Empty"
+            End -> "End"
+            is NextStep -> "NextStep($percentage)"
         }
     }
 }
