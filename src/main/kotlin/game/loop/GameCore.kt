@@ -5,9 +5,7 @@ import game.Game
 class GameCore {
     companion object {
         private fun canMove(row: List<ObjectStateWithLoop>, direction: Game.MoveDirection): Boolean {
-            if (!row.contains(ObjectStateWithLoop.Actual)) throw Game.GameError.ActualFieldNotFound
-            val pos = row.indexOf(ObjectStateWithLoop.Actual)
-
+            val pos = row.getActualIndex()
             if (!row.indices.contains(pos + direction.step)) return false // throw GameError.NextPosOutOfBounds
 
             for (i in direction.toRange()) {
@@ -25,8 +23,8 @@ class GameCore {
             fillUpDelay: Long = 300L
         ): MutableList<ObjectStateWithLoop> {
             val rowCopy = row.toMutableList()
-            val nextPos = rowCopy.getHighlightIndex()
-            val nextStep = rowCopy.getHighlight()
+            val nextPos = row.getHighlightIndex()
+            val nextStep = row.getHighlight()
             rowCopy.removeHighlights()
 
             if (!canMove(row, direction) || direction is Game.MoveDirection.Stay) return rowCopy
@@ -70,7 +68,8 @@ class GameCore {
     }
 }
 
-typealias GameRow = MutableList<ObjectStateWithLoop>
+typealias GameRow = List<ObjectStateWithLoop>
+typealias GameRowMutable = MutableList<ObjectStateWithLoop>
 
 fun GameRow.getActualIndex(): Int {
     return indexOfFirst { it is ObjectStateWithLoop.Actual }.also {
@@ -86,7 +85,7 @@ fun GameRow.getHighlight(): ObjectStateWithLoop.NextStep? {
     return find { it is ObjectStateWithLoop.NextStep } as? ObjectStateWithLoop.NextStep
 }
 
-fun GameRow.removeHighlights() {
+fun GameRowMutable.removeHighlights() {
     replaceAll {
         when (it) {
             is ObjectStateWithLoop.NextStep -> ObjectStateWithLoop.Empty
