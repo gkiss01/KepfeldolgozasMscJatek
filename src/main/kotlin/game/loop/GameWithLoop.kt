@@ -44,7 +44,7 @@ class GameWithLoop(
         if (state == GameState.RUNNING) return
 
         if (state == GameState.STARTING)
-            objects.swapList(GameCore.generateFirstMap(rows, cols))
+            objects.swapList(GameCore.generateMap(rows, cols))
 
         coroutineScope.launch {
             lastTimestamp = System.currentTimeMillis()
@@ -120,8 +120,7 @@ class GameWithLoop(
         angle = Double.NaN
 
         // mezők frissítése => haladásjelző frissítése, átlépés
-        objects[objects.lastIndex] =
-            GameCore.markMove(objects[objects.lastIndex], direction, fillUpDelay)
+        objects[objects.lastIndex].markMove(direction, fillUpDelay)
     }
 
     enum class GameState {

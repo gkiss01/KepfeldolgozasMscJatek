@@ -4,49 +4,8 @@ import game.Game
 
 class GameCore {
     companion object {
-        private fun canMove(row: List<ObjectStateWithLoop>, direction: Game.MoveDirection): Boolean {
-            val pos = row.getActualIndex()
-            if (!row.indices.contains(pos + direction.step)) return false // throw GameError.NextPosOutOfBounds
-
-            for (i in direction.toRange()) {
-                if (row[pos + i] !is ObjectStateWithLoop.Empty &&
-                    row[pos + i] !is ObjectStateWithLoop.NextStep
-                ) return false
-            }
-
-            return true
-        }
-
-        fun markMove(
-            row: List<ObjectStateWithLoop>,
-            direction: Game.MoveDirection,
-            fillUpDelay: Long = 300L
-        ): MutableList<ObjectStateWithLoop> {
-            val rowCopy = row.toMutableList()
-            val nextPos = row.getHighlightIndex()
-            val nextStep = row.getHighlight()
-            rowCopy.removeHighlights()
-
-            if (!canMove(row, direction) || direction is Game.MoveDirection.Stay) return rowCopy
-
-            val actualPos = rowCopy.getActualIndex()
-            if (nextPos != -1 && actualPos + direction.step == nextPos) {
-                val fraction = 0.9 / (fillUpDelay / 16L)
-                val newPercentage = nextStep!!.percentage + fraction
-                if (newPercentage >= 1.0) {
-                    rowCopy[actualPos] = ObjectStateWithLoop.Empty
-                    rowCopy[nextPos] = ObjectStateWithLoop.Actual
-                } else {
-                    rowCopy[nextPos] = ObjectStateWithLoop.NextStep(newPercentage)
-                }
-            } else {
-                rowCopy[actualPos + direction.step] = ObjectStateWithLoop.NextStep(0.1)
-            }
-            return rowCopy
-        }
-
-        fun generateFirstMap(rows: Int, cols: Int): MutableList<MutableList<ObjectStateWithLoop>> {
-            val objects = mutableListOf<MutableList<ObjectStateWithLoop>>()
+        fun generateMap(rows: Int, cols: Int): MutableList<GameRowMutable> {
+            val objects = mutableListOf<GameRowMutable>()
 
             for (i in 1 until rows)
                 objects += generateRow(cols, 0.0)
@@ -55,11 +14,11 @@ class GameCore {
             return objects
         }
 
-        fun generateRow(cols: Int, probability: Double = 0.2): MutableList<ObjectStateWithLoop> {
+        fun generateRow(cols: Int, probability: Double = 0.2): GameRowMutable {
             return (0 until cols).map { ObjectStateWithLoop.getRandom(probability) }.toMutableList()
         }
 
-        private fun generateStartRow(cols: Int): MutableList<ObjectStateWithLoop> {
+        private fun generateStartRow(cols: Int): GameRowMutable {
             return generateRow(cols, 0.0).also {
                 val centralIndex = it.size / 2
                 it[centralIndex] = ObjectStateWithLoop.Actual
@@ -83,6 +42,44 @@ fun GameRow.getHighlightIndex(): Int {
 
 fun GameRow.getHighlight(): ObjectStateWithLoop.NextStep? {
     return find { it is ObjectStateWithLoop.NextStep } as? ObjectStateWithLoop.NextStep
+}
+
+fun GameRow.canMove(direction: Game.MoveDirection): Boolean {
+    val pos = this.getActualIndex()
+    if (!this.indices.contains(pos + direction.step)) return false // throw GameError.NextPosOutOfBounds
+
+    for (i in direction.toRange()) {
+        if (this[pos + i] !is ObjectStateWithLoop.Empty &&
+            this[pos + i] !is ObjectStateWithLoop.NextStep
+        ) return false
+    }
+
+    return true
+}
+
+fun GameRowMutable.markMove(
+    direction: Game.MoveDirection,
+    fillUpDelay: Long = 300L
+) {
+    val nextPos = this.getHighlightIndex()
+    val nextStep = this.getHighlight()
+    this.removeHighlights()
+
+    if (!this.canMove(direction) || direction is Game.MoveDirection.Stay) return
+
+    val actualPos = this.getActualIndex()
+    if (nextPos != -1 && actualPos + direction.step == nextPos) {
+        val fraction = 0.9 / (fillUpDelay / 16L)
+        val newPercentage = nextStep!!.percentage + fraction
+        if (newPercentage >= 1.0) {
+            this[actualPos] = ObjectStateWithLoop.Empty
+            this[nextPos] = ObjectStateWithLoop.Actual
+        } else {
+            this[nextPos] = ObjectStateWithLoop.NextStep(newPercentage)
+        }
+    } else {
+        this[actualPos + direction.step] = ObjectStateWithLoop.NextStep(0.1)
+    }
 }
 
 fun GameRowMutable.removeHighlights() {
