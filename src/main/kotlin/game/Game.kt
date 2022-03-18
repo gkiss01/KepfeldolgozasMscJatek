@@ -4,8 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.*
 
 class Game(
@@ -29,14 +27,10 @@ class Game(
 
     private val objects = mutableListOf<GameRowMutable>()
 
-    private var angle: Double = Double.NaN
+    var angle: Double = Double.NaN
         set(value) {
             field = value.coerceIn(0.0, 180.0)
         }
-
-    // később vedd ki
-    var width by mutableStateOf(0.dp)
-    var height by mutableStateOf(0.dp)
 
     fun start() {
         if (state == GameState.RUNNING) return
@@ -115,13 +109,9 @@ class Game(
         val direction = GameMove.fromAngle(angle)
 
         // szög elfelejtése => így ha nincs bemenet, megáll a lépkedés
-        angle = Double.NaN
+        // angle = Double.NaN
 
         // mezők frissítése => haladásjelző frissítése, átlépés
         objects[objects.lastIndex].markMove(direction, fillUpDelay)
-    }
-
-    fun updatePointerLocation(offset: DpOffset) {
-        angle = (1 - (offset.x / width)) * 180.0
     }
 }

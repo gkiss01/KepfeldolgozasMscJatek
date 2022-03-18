@@ -13,16 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.input.pointer.pointerMoveFilter
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.DpOffset
 import game.Game
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Preview
-fun App() {
+fun App(angle: Double) {
     val game = remember { Game(5, 5) }
     val density = LocalDensity.current
 
@@ -30,22 +27,15 @@ fun App() {
         game.start()
     }
 
+    LaunchedEffect(key1 = angle) {
+        game.angle = angle
+    }
+
     MaterialTheme {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .clipToBounds()
-            .pointerMoveFilter(onMove = {
-                with(density) {
-                    game.updatePointerLocation(DpOffset(it.x.toDp(), it.y.toDp()))
-                }
-                false
-            })
-            .onSizeChanged {
-                with(density) {
-                    game.width = it.width.toDp()
-                    game.height = it.height.toDp()
-                }
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clipToBounds()
         ) {
             Column {
                 GameMap(game.objectsToRender, game.cols)
