@@ -4,7 +4,7 @@ import game.Game
 
 class GameCore {
     companion object {
-        fun canMove(row: List<ObjectStateWithLoop>, direction: Game.MoveDirection): Boolean {
+        private fun canMove(row: List<ObjectStateWithLoop>, direction: Game.MoveDirection): Boolean {
             if (!row.contains(ObjectStateWithLoop.Actual)) throw Game.GameError.ActualFieldNotFound
             val pos = row.indexOf(ObjectStateWithLoop.Actual)
 
@@ -47,11 +47,6 @@ class GameCore {
             return rowCopy
         }
 
-        fun getPos(row: List<ObjectStateWithLoop>): Int {
-            if (!row.contains(ObjectStateWithLoop.Actual)) throw Game.GameError.ActualFieldNotFound
-            return row.indexOf(ObjectStateWithLoop.Actual)
-        }
-
         fun generateFirstMap(rows: Int, cols: Int): MutableList<MutableList<ObjectStateWithLoop>> {
             val objects = mutableListOf<MutableList<ObjectStateWithLoop>>()
 
@@ -78,7 +73,9 @@ class GameCore {
 typealias GameRow = MutableList<ObjectStateWithLoop>
 
 fun GameRow.getActualIndex(): Int {
-    return indexOfFirst { it is ObjectStateWithLoop.Actual }
+    return indexOfFirst { it is ObjectStateWithLoop.Actual }.also {
+        if (it == -1) throw Game.GameError.ActualFieldNotFound
+    }
 }
 
 fun GameRow.getHighlightIndex(): Int {

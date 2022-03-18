@@ -30,7 +30,6 @@ class GameWithLoop(
     private var lastIterationTimestamp = 0L
 
     private val objects = mutableListOf<MutableList<ObjectStateWithLoop>>()
-    private var nextDirection: Game.MoveDirection = Game.MoveDirection.Stay
 
     private var angle: Double = Double.NaN
         set(value) {
@@ -87,31 +86,29 @@ class GameWithLoop(
     }
 
     private fun updateGameMap() {
-        // lépés megtétele az alsó sorban
-//        objects[objects.lastIndex] =
-//            GameCore.makeMove(objects[objects.lastIndex], nextDirection)
-//        nextDirection = Game.MoveDirection.Stay
+        // aktuális pozíció lekérése
+        val pos = objects[objects.lastIndex].getActualIndex()
 
-        // az elem léptetése egy sorral feljebb
-        val pos = GameCore.getPos(objects[objects.lastIndex])
-        if (objects[objects.lastIndex - 1][pos] !is ObjectStateWithLoop.Empty) { // a felső sor ellenőrzése, hogy van-e ott fal
+        // a játéktábla léptetése egy sorral lejjebb
+        if (objects[objects.lastIndex - 1][pos] !is ObjectStateWithLoop.Empty) { // ha falba ütközünk, a játéknak vége
             objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.End
             stop()
         } else {
+            // aktuális mező átléptetése
             objects[objects.lastIndex - 1][pos] = ObjectStateWithLoop.Actual
 
-            // töltés megjegyzése
-            val nextPos = objects[objects.lastIndex].indexOfFirst { it is ObjectStateWithLoop.NextStep }
-            if (nextPos != -1 && objects[objects.lastIndex - 1][nextPos] is ObjectStateWithLoop.Empty) {
-                val nextStepObject = objects[objects.lastIndex].elementAt(nextPos) as ObjectStateWithLoop.NextStep
-                objects[objects.lastIndex - 1][nextPos] = ObjectStateWithLoop.NextStep(nextStepObject.percentage)
+            // következő mező irányának megjegyzése és betöltése az új sorba
+            val nextPos = objects[objects.lastIndex].getHighlightIndex()
+            if (nextPos != -1 && objects[objects.lastIndex - 1][nextPos] is ObjectStateWithLoop.Empty) { // csak ha ott üres mező áll
+                val nextStep = objects[objects.lastIndex].getHighlight()
+                objects[objects.lastIndex - 1][nextPos] = ObjectStateWithLoop.NextStep(nextStep!!.percentage)
             }
         }
 
-        // új sor beszúrása felülre
+        // új sor beszúrása a játéktábla tetejére
         objects.add(0, GameCore.generateRow(cols, difficulty))
 
-        // utolsó sor törlése
+        // utolsó sor törlése a játéktábla aljáról
         objects.removeLast()
     }
 
