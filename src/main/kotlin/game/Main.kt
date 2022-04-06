@@ -10,7 +10,7 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import game.composables.App
-import initWindows
+import initApplicationWindows
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -21,15 +21,14 @@ import org.opencv.highgui.HighGui
 import org.opencv.videoio.VideoCapture
 import org.opencv.videoio.Videoio
 import processImage
-import java.awt.Toolkit
+import screenDimension
 import kotlin.system.exitProcess
 
 @OptIn(DelicateCoroutinesApi::class)
 fun main() {
     OpenCV.loadLocally()
 
-    val screenDimension = Toolkit.getDefaultToolkit().screenSize
-    initWindows(screenDimension)
+    initApplicationWindows()
 
     var job: Job? = null
     val cap = VideoCapture(0, Videoio.CAP_DSHOW)
@@ -40,7 +39,7 @@ fun main() {
         job = GlobalScope.launch {
             while (true) {
                 if (!cap.read(img)) continue
-                angle = processImage(img, screenDimension)
+                angle = processImage(img)
 
                 val keyPressed = HighGui.waitKey(16)
                 if (keyPressed == 27) break
